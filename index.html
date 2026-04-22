@@ -1,0 +1,1511 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HFT — สินค้าทั้งหมด</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Noto+Sans+Thai:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── RESET & TOKENS ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: #ffffff;
+      color: #0c0c0c;
+      font-family: 'Noto Sans Thai', sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ─── SCROLLBAR ─── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #ffffff; }
+    ::-webkit-scrollbar-thumb { background: #2a2a30; border-radius: 99px; }
+
+    /* ─── HEADER ─── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      background: #333399;
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid #2a2a30;
+    }
+    .header-inner {
+      max-width: 1400px; margin: 0 auto;
+      padding: 0 24px;
+      height: 64px;
+      display: flex; align-items: center; gap: 20px;
+    }
+    
+    /* nav menu */
+    .nav-bar {
+      background: rgba(0, 0, 0, 0.1);
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    .nav-inner {
+      max-width: 1400px; margin: 0 auto;
+      padding: 0 24px;
+      height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      gap: 25px;
+      overflow-x: auto;
+      scrollbar-width: none; /* Firefox */
+    }
+    .nav-inner::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+    
+    .nav-link {
+      color: rgba(255,255,255,0.85);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: color .28s cubic-bezier(.4,0,.2,1);
+    }
+    .nav-link:hover {
+      color: #c9c9c9;
+    }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; font-weight: 700;
+      color: #c9c9c9;
+      letter-spacing: .5px;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .logo span { color: #0c0c0c; }
+
+    /* search */
+    .search-wrap {
+      flex: 1; max-width: 520px; margin: 0 auto;
+      position: relative;
+    }
+    .search-wrap input {
+      width: 100%; height: 40px;
+      background: #ffffff;
+      border: 1px solid #2a2a30;
+      border-radius: 99px;
+      color: #0c0c0c;
+      padding: 0 44px 0 18px;
+      font-size: 14px; font-family: inherit;
+      outline: none;
+      transition: border-color .28s cubic-bezier(.4,0,.2,1), box-shadow .28s cubic-bezier(.4,0,.2,1);
+    }
+    .search-wrap input::placeholder { color: #7a7875; }
+    .search-wrap input:focus {
+      border-color: #c9c9c9;
+      box-shadow: 0 0 0 3px rgba(201,168,76,.15);
+    }
+    .search-wrap svg {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      color: #7a7875; pointer-events: none;
+    }
+
+    /* cart */
+    .cart-btn {
+      position: relative;
+      background: #ffffff;
+      border: 1px solid #2a2a30;
+      border-radius: 14px;
+      color: #0c0c0c;
+      width: 44px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: border-color .28s cubic-bezier(.4,0,.2,1), background .28s cubic-bezier(.4,0,.2,1);
+    }
+    .cart-btn:hover { border-color: #c9c9c9; background: rgba(201,168,76,.08); }
+    .cart-count {
+      position: absolute; top: -6px; right: -6px;
+      background: #c9c9c9; color: #0d0d0f;
+      font-size: 11px; font-weight: 700;
+      width: 18px; height: 18px;
+      border-radius: 99px;
+      display: flex; align-items: center; justify-content: center;
+      display: none;
+    }
+
+    /* ─── HERO STRIP ─── */
+.hero-strip {
+  background:
+    linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+    url('./img/Banner-Cate.png');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  border-bottom: 1px solid #2a2a30;
+  padding: 40px 24px;
+  text-align: center;
+}
+    .hero-strip h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(28px, 5vw, 52px);
+      font-weight: 700;
+      color: #ffffff;
+    }
+    .hero-strip h1 em { font-style: normal; color: #c9c9c9; }
+    .hero-strip p { color: #b4b4b4; margin-top: 8px; font-size: 15px; }
+
+    /* ─── TOOLBAR ─── */
+    .toolbar {
+      max-width: 1400px; margin: 0 auto;
+      padding: 20px 24px;
+      display: flex; align-items: flex-start; flex-wrap: wrap; gap: 20px;
+    }
+
+    /* category circular items */
+    .cats {
+      display: flex; align-items: flex-start;
+      gap: 20px; flex-wrap: nowrap; flex: 1;
+      overflow-x: auto; padding: 10px 0;
+      scrollbar-width: none;
+    }
+    .cats::-webkit-scrollbar { display: none; }
+
+    .cat-item {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 8px; cursor: pointer; flex-shrink: 0;
+      width: 85px;
+    }
+    .cat-img-wrap {
+      width: 70px; height: 70px;
+      border-radius: 50%; overflow: hidden;
+      border: 2px solid #eee;
+      transition: all .28s cubic-bezier(.4,0,.2,1);
+      background: #f5f5f5;
+    }
+    .cat-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform .3s ease;
+    }
+    .cat-item:hover .cat-img-wrap {
+      border-color: #333399;
+      transform: translateY(-3px);
+      box-shadow: 0 4px 12px rgba(51,51,153,0.2);
+    }
+    .cat-item:hover .cat-img-wrap img { transform: scale(1.1); }
+    
+    .cat-item.active .cat-img-wrap {
+      border-color: #333399;
+      box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #333399;
+    }
+    
+    .cat-label {
+      font-size: 13px; font-weight: 500; color: #7a7875;
+      text-align: center; white-space: nowrap;
+      transition: color .2s;
+    }
+    .cat-item:hover .cat-label, .cat-item.active .cat-label {
+      color: #333399; font-weight: 600;
+    }
+
+    /* sort & view */
+    .toolbar-right { display: flex; gap: 10px; align-items: center; margin-top: 15px; }
+    select#sort-select {
+      background: #ffffff; border: 1px solid #2a2a30;
+      color: #0c0c0c; border-radius: 8px;
+      padding: 7px 12px; font-size: 13px; font-family: inherit;
+      outline: none; cursor: pointer;
+      transition: border-color .28s cubic-bezier(.4,0,.2,1);
+    }
+    select#sort-select:focus { border-color: #c9c9c9; }
+
+    .view-btns { display: flex; gap: 4px; }
+    .view-btn {
+      width: 34px; height: 34px;
+      background: #ffffff; border: 1px solid #2a2a30;
+      border-radius: 8px; color: #7a7875;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all .28s cubic-bezier(.4,0,.2,1);
+    }
+    .view-btn:hover { border-color: #c9c9c9; color: #c9c9c9; }
+    .view-btn.active { background: #c9c9c9; border-color: #c9c9c9; color: #0d0d0f; }
+
+    /* ─── MAIN LAYOUT ─── */
+    .main-container {
+      max-width: 1400px; margin: 0 auto; padding: 0 24px 60px;
+      display: flex; gap: 20px;
+    }
+    .main-content {
+      flex: 1;
+    }
+    .sidebar {
+      width: 280px;
+      flex-shrink: 0;
+    }
+
+    .results-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; color: #7a7875; font-size: 13px;
+    }
+    .results-bar span em { color: #c9c9c9; font-style: normal; font-weight: 600; }
+
+    /* ─── PRODUCT GRID ─── */
+    #product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+    #product-grid.list-view {
+      grid-template-columns: 1fr;
+    }
+
+    /* ─── PRODUCT CARD ─── */
+    .p-card {
+      background: #ffffff;
+      border: 1px solid #2a2a30;
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform .28s cubic-bezier(.4,0,.2,1), border-color .28s cubic-bezier(.4,0,.2,1), box-shadow .28s cubic-bezier(.4,0,.2,1);
+      animation: fadeUp .45s both;
+    }
+    .p-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(201,168,76,.4);
+      box-shadow: 0 8px 32px rgba(0,0,0,.55);
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* image */
+    .p-img-wrap {
+      position: relative; overflow: hidden;
+      aspect-ratio: 4/3;
+      background: #111115;
+    }
+    .p-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform .5s ease;
+      display: block;
+    }
+    .p-card:hover .p-img-wrap img { transform: scale(1.06); }
+
+    .badge {
+      position: absolute; top: 10px; left: 10px;
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 11px; font-weight: 700; letter-spacing: .5px;
+    }
+    .badge-new  { background: #1d3a2a; color: #5dba87; }
+    .badge-sale { background: #3a1d1d; color: #e05555; }
+    .badge-hot  { background: #3a2a1d; color: #e09055; }
+
+    .p-wishlist {
+      position: absolute; top: 10px; right: 10px;
+      width: 32px; height: 32px;
+      background: rgba(13,13,15,.7);
+      border: 1px solid #2a2a30;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #7a7875;
+      transition: all .28s cubic-bezier(.4,0,.2,1);
+      font-size: 15px;
+      opacity: 0;
+    }
+    .p-card:hover .p-wishlist { opacity: 1; }
+    .p-wishlist:hover, .p-wishlist.liked { color: #e05555; border-color: #e05555; }
+
+    /* body */
+    .p-body { padding: 14px 16px 16px; }
+
+    .p-cat { font-size: 11px; color: #7a7875; text-transform: uppercase; letter-spacing: .8px; }
+    .p-name {
+      font-size: 15px; font-weight: 600; color: #0c0c0c;
+      margin: 4px 0 8px;
+      display: -webkit-box; -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical; overflow: hidden;
+    }
+
+    .p-stars { display: flex; align-items: center; gap: 4px; margin-bottom: 10px; }
+    .stars { color: #c9c9c9; font-size: 13px; letter-spacing: 1px; }
+    .p-stars span { font-size: 12px; color: #7a7875; }
+
+    .p-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .p-price { display: flex; flex-direction: column; }
+    .price-main { font-size: 17px; font-weight: 700; color: #ff0000; }
+    .price-old  { font-size: 12px; color: #000000; text-decoration: line-through; }
+
+    .add-btn {
+      padding: 8px 16px;
+      background: transparent;
+      border: 1px solid #000000;
+      border-radius: 8px;
+      color: #000000;
+      font-size: 13px; font-weight: 600; font-family: inherit;
+      cursor: pointer; white-space: nowrap;
+      transition: all .28s cubic-bezier(.4,0,.2,1);
+    }
+    .add-btn:hover {
+      background: #c9c9c9; color: #0d0d0f;
+    }
+    .add-btn.added {
+      background: #c9c9c9; color: #0d0d0f;
+    }
+
+    /* ─── LIST VIEW CARD ─── */
+    #product-grid.list-view .p-card {
+      display: flex; align-items: center;
+    }
+    #product-grid.list-view .p-img-wrap {
+      width: 160px; min-width: 160px; aspect-ratio: 1;
+    }
+    #product-grid.list-view .p-body {
+      flex: 1; display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    }
+    #product-grid.list-view .p-name { -webkit-line-clamp: 1; flex: 1; min-width: 140px; }
+    #product-grid.list-view .p-footer { flex-shrink: 0; }
+
+    /* ─── EMPTY STATE ─── */
+    .empty-state {
+      grid-column: 1/-1;
+      text-align: center; padding: 80px 20px;
+    }
+    .empty-state .icon { font-size: 52px; margin-bottom: 16px; }
+    .empty-state h3 { font-size: 20px; margin-bottom: 8px; }
+    .empty-state p { color: #7a7875; }
+
+    /* ─── TOAST ─── */
+    #toast {
+      position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
+      background: #c9c9c9; color: #0d0d0f;
+      padding: 11px 22px; border-radius: 99px;
+      font-size: 14px; font-weight: 600;
+      box-shadow: 0 4px 24px rgba(201,168,76,.35);
+      z-index: 999;
+      transition: transform .35s cubic-bezier(.4,0,.2,1);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    /* ─── MODAL ─── */
+    #modal-overlay {
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.75); backdrop-filter: blur(6px);
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    #modal-overlay.open { display: flex; }
+    .modal {
+      background: #ffffff; border: 1px solid #2a2a30;
+      border-radius: 20px; max-width: 640px; width: 100%;
+      max-height: 90vh; overflow-y: auto;
+      animation: modalIn .3s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(.92); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .modal-gallery { width: 100%; }
+    .modal-img-main { 
+      width: 100%; aspect-ratio: 16/9; object-fit: cover; 
+      border-radius: 18px 18px 0 0; 
+      display: block;
+      background: #f5f5f5;
+    }
+    .modal-thumbnails {
+      display: flex; gap: 10px; padding: 12px 24px 0;
+      justify-content: center;
+    }
+    .modal-thumb {
+      width: 60px; height: 60px;
+      border-radius: 8px; border: 2px solid #eee;
+      object-fit: cover; cursor: pointer;
+      transition: all .2s;
+    }
+    .modal-thumb:hover { border-color: #333399; }
+    .modal-thumb.active { border-color: #333399; transform: scale(1.05); }
+    .modal-body { padding: 24px; }
+    .modal-cat { color: #c9c9c9; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+    .modal-name { font-family: 'Playfair Display', serif; font-size: 24px; margin: 8px 0 12px; }
+    .modal-desc { color: #7a7875; font-size: 14px; line-height: 1.8; margin-bottom: 20px; }
+    .modal-price { font-size: 26px; font-weight: 700; color: #000000; margin-bottom: 20px; }
+    .modal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .modal-add {
+      flex: 1; padding: 13px;
+      background: #c9c9c9; color: #0d0d0f;
+      border: none; border-radius: 14px;
+      font-size: 15px; font-weight: 700; font-family: inherit;
+      cursor: pointer; transition: opacity .28s cubic-bezier(.4,0,.2,1);
+    }
+    .modal-add:hover { opacity: .88; }
+    .modal-close {
+      padding: 13px 20px;
+      background: #f74646; color: #ffffff;
+      border: 1px solid #2a2a30; border-radius: 14px;
+      font-size: 15px; font-family: inherit;
+      cursor: pointer; transition: all .28s cubic-bezier(.4,0,.2,1);
+    }
+    .modal-close:hover { border-color: #c9c9c9; color: #0c0c0c; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid #2a2a30;
+      text-align: center; padding: 28px;
+      color: #7a7875; font-size: 13px;
+    }
+    footer a { color: #c9c9c9; text-decoration: none; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 640px) {
+      .hero-strip { padding: 28px 16px; }
+      .toolbar { padding: 14px 16px; }
+      .main { padding: 0 16px 40px; }
+      .header-inner { padding: 0 16px; gap: 12px; }
+      .cats { gap: 6px; }
+      #product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      #product-grid.list-view .p-img-wrap { width: 110px; min-width: 110px; }
+      #product-grid.list-view .p-body { gap: 8px; }
+      .add-btn { padding: 7px 10px; font-size: 12px; }
+      .price-main { font-size: 15px; }
+    }
+    @media (max-width: 400px) {
+      #product-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ─── SIDEBAR FILTERS ─── */
+    .sidebar {
+      background: #ffffff;
+      border: 1px solid #2a2a30;
+      border-radius: 14px;
+      padding: 20px;
+      align-self: start; /* Stick to the top */
+      position: sticky;
+      top: 128px; /* Adjust based on header height (64px + 44px + spacing) */
+    }
+    .filter-section {
+      margin-bottom: 20px;
+    }
+    .filter-section:last-child {
+      margin-bottom: 0;
+    }
+    .filter-section h3 {
+      font-size: 16px;
+      color: #0c0c0c;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #2a2a30;
+      padding-bottom: 8px;
+    }
+    .filter-options {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .filter-options label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #7a7875;
+      cursor: pointer;
+      transition: color .28s cubic-bezier(.4,0,.2,1);
+    }
+    .filter-options label:hover {
+      color: #c9c9c9;
+    }
+    .filter-options input[type="checkbox"] {
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border: 1px solid #2a2a30;
+      border-radius: 4px;
+      background: #ffffff;
+      display: grid;
+      place-content: center;
+      cursor: pointer;
+    }
+    .filter-options input[type="checkbox"]::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      transform: scale(0);
+      transition: transform .12s ease-in-out;
+      box-shadow: inset 1em 1em #c9c9c9;
+      border-radius: 2px;
+    }
+    .filter-options input[type="checkbox"]:checked::before {
+      transform: scale(1);
+    }
+    .filter-options input[type="checkbox"]:checked {
+      border-color: #c9c9c9;
+    }
+
+    .filter-select {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #2a2a30;
+      color: #0c0c0c;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 13px;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+      transition: border-color .28s cubic-bezier(.4,0,.2,1);
+      -webkit-appearance: none; /* Remove default arrow for Chrome/Safari */
+      -moz-appearance: none;    /* Remove default arrow for Firefox */
+      appearance: none;         /* Remove default arrow */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%237a7875' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      background-size: 16px;
+    }
+    .filter-select:focus {
+      border-color: #c9c9c9;
+    }
+
+    .price-range {
+      flex-direction: row;
+      align-items: center;
+    }
+    .price-range input {
+      width: 80px;
+      padding: 6px 10px;
+      border: 1px solid #2a2a30;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #0c0c0c;
+      font-size: 13px;
+      outline: none;
+    }
+    .price-range span {
+      color: #7a7875;
+    }
+    .price-range button {
+      padding: 6px 12px;
+      background: #c9c9c9;
+      color: #0d0d0f;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: opacity .28s cubic-bezier(.4,0,.2,1);
+    }
+    .price-range button:hover {
+      opacity: 0.88;
+    }
+
+    @media (max-width: 768px) {
+      .header-inner { padding: 0 16px; gap: 12px; }
+      .logo img { height: 32px; }
+      .search-wrap { display: none; }
+    }
+
+    /* ─── WELCOME POPUP ─── */
+#welcome-popup-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+#welcome-popup-overlay.open {
+  display: flex;
+}
+
+.welcome-popup {
+  background: #ffffff;
+  border-radius: 20px;
+  max-width: 520px;
+  width: 100%;
+  padding: 30px;
+  text-align: left; /* เปลี่ยนจาก center เป็น left จะอ่านง่าย */
+  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  animation: popupIn .4s cubic-bezier(.4,0,.2,1);
+}
+
+.welcome-popup h2 {
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.welcome-popup .desc {
+  font-size: 14px;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  color: #444;
+}
+
+.welcome-popup h3 {
+  margin-bottom: 10px;
+}
+
+.task-list {
+  padding-left: 18px;
+  margin-bottom: 25px;
+}
+
+.task-list li {
+  margin-bottom: 6px;
+  line-height: 1.5;
+}
+
+.task-list a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.task-list a:hover {
+  text-decoration: underline;
+}
+
+.welcome-popup-close {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: #000;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.welcome-popup-close:hover {
+  opacity: 0.9;
+}
+
+/* animation */
+@keyframes popupIn {
+  from {
+    opacity: 0;
+    transform: scale(.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+    .welcome-popup h2 { font-family: 'Playfair Display', serif; font-size: 28px; margin-bottom: 16px; color: #333399; }
+    .welcome-popup p { color: #7a7875; font-size: 16px; line-height: 1.6; margin-bottom: 24px; }
+    .welcome-popup-close {
+      width: 100%; padding: 14px;
+      background: #333399; color: #fff;
+      border: none; border-radius: 12px;
+      font-size: 16px; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s;
+    }
+    .welcome-popup-close:hover { opacity: 0.9; }
+
+    /* Mobile Search Toggle */
+    .mobile-search-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-search-btn { display: block; }
+      .header-inner { justify-content: space-between; }
+    }
+
+    .mobile-search-wrap {
+      display: none;
+      padding: 12px 16px;
+      background: rgba(0,0,0,0.1);
+    }
+    .mobile-search-wrap.active { display: block; }
+    .mobile-search-wrap input {
+      width: 100%; height: 40px;
+      background: #fff; border: 1px solid #2a2a30; border-radius: 99px;
+      color: #0c0c0c; padding: 0 18px; font-size: 14px; font-family: inherit; outline: none;
+    }
+
+    /* ─── NAVIGATION ─── */
+    .hamburger-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .nav-bar {
+        position: relative;
+      }
+      .hamburger-btn { display: block; }
+      .nav-inner {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: #333399;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+        height: auto;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+        z-index: 99;
+        border-top: none;
+      }
+      .nav-inner.open {
+        max-height: 500px;
+        overflow-y: auto;
+      }
+      .nav-link {
+        display: block;
+        width: 100%;
+        padding: 12px 24px;
+        border-bottom: 1px solid rgba(255,255,255,0.1);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        position: static;
+        margin-bottom: 20px;
+      }
+      .filter-section {
+        margin-bottom: 15px;
+      }
+      .filter-select {
+        font-size: 14px;
+        padding: 10px 12px;
+      }
+      .price-range {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .price-range input {
+        width: calc(50% - 20px);
+        padding: 8px 10px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .hero-strip { padding: 24px 16px; }
+      .hero-strip h1 { font-size: clamp(24px, 7vw, 36px); }
+      .toolbar { padding: 14px 16px; gap: 12px; }
+      .cats { gap: 12px; padding: 5px 0; }
+      .cat-item { width: 75px; }
+      .cat-img-wrap { width: 60px; height: 60px; }
+      .cat-label { font-size: 11px; }
+      .toolbar-right { width: 100%; justify-content: space-between; margin-top: 5px; }
+      #product-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+      .p-body { padding: 10px 12px; }
+      .p-name { font-size: 13px; }
+      .price-main { font-size: 14px; }
+      .add-btn { padding: 6px 10px; font-size: 11px; }
+      #product-grid.list-view .p-img-wrap { width: 90px; min-width: 90px; }
+      #product-grid.list-view .p-body { padding: 8px; }
+      .results-bar { font-size: 12px; margin-bottom: 14px; }
+    }
+
+    @media (max-width: 480px) {
+      #product-grid { grid-template-columns: 1fr; gap: 16px; }
+      #product-grid.list-view { grid-template-columns: 1fr; }
+    }
+
+    /* ─── SIDE CART DRAWER ─── */
+    #cart-drawer-overlay {
+      position: fixed; inset: 0; z-index: 300;
+      background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+      display: none;
+    }
+    #cart-drawer-overlay.open { display: block; }
+
+    .cart-drawer {
+      position: fixed; top: 0; right: -400px; width: 380px; height: 100%;
+      background: #ffffff; z-index: 301;
+      box-shadow: -5px 0 30px rgba(0,0,0,0.15);
+      transition: right 0.3s ease;
+      display: flex; flex-direction: column;
+    }
+    #cart-drawer-overlay.open + .cart-drawer,
+    .cart-drawer.open { right: 0; }
+
+    .cart-header {
+      padding: 16px; border-bottom: 1px solid #eee;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cart-header h3 { font-size: 16px; font-weight: 700; }
+    .close-drawer { background: none; border: none; font-size: 24px; cursor: pointer; color: #7a7875; }
+
+    .cart-items { flex: 1; overflow-y: auto; padding: 16px; }
+    .cart-item {
+      display: flex; gap: 12px; margin-bottom: 16px; align-items: center;
+    }
+    .cart-item img { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .cart-item-price { font-size: 13px; color: #7a7875; }
+
+    .cart-qty-control {
+      display: flex; align-items: center; gap: 8px; margin-top: 8px;
+    }
+    .qty-btn {
+      width: 28px; height: 28px; border: 1px solid #ddd; border-radius: 6px;
+      background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .remove-item { color: #f74646; background: none; border: none; cursor: pointer; font-size: 12px; margin-left: auto; text-decoration: underline; }
+
+    .cart-footer {
+      padding: 16px; border-top: 1px solid #eee; background: #f9f9f9;
+    }
+    .cart-total-row {
+      display: flex; justify-content: space-between; margin-bottom: 12px;
+      font-size: 16px; font-weight: 700;
+    }
+    .checkout-btn {
+      width: 100%; padding: 14px; background: #333399; color: #fff;
+      border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: opacity 0.2s; text-decoration: none;
+      display: block; text-align: center;
+    }
+    .checkout-btn:hover { opacity: 0.9; }
+
+    @media (max-width: 450px) {
+      .cart-drawer { width: 100%; right: -100%; }
+      .cart-item { gap: 10px; }
+      .cart-item img { width: 50px; height: 50px; }
+    }
+
+    /* Tablet adjustments */
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .sidebar {
+        width: 240px;
+      }
+      #product-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+
+    .logo img {
+  height: 40px;   /* ปรับขนาดได้ */
+  width: auto;
+  display: block;
+}
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─── -->
+<header>
+  <div class="header-inner">
+    <button class="hamburger-btn" id="hamburger-btn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <!-- <a class="logo" href="#"><img src="logo.png" alt="HFT Logo"></a> -->
+    <div class="search-wrap">
+      <input type="text" id="search-input" placeholder="ค้นหาสินค้า..." autocomplete="off" />
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+    <button class="mobile-search-btn" id="mobile-search-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+    <button class="cart-btn" id="cart-btn" title="ตะกร้าสินค้า">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </div>
+  <div class="mobile-search-wrap" id="mobile-search">
+    <input type="text" id="mobile-search-input" placeholder="ค้นหาสินค้า..." autocomplete="off" />
+  </div>
+
+  <div class="nav-bar">
+    <nav class="nav-inner" id="nav-inner">
+      <a href="index.html" class="nav-link">สินค้าของเรา</a>
+      <a href="#" class="nav-link">วิธีการสั่งซื้อ</a>
+      <a href="#" class="nav-link">บทความ</a>
+      <a href="#" class="nav-link">แจ้งการโอนเงิน</a>
+      <a href="#" class="nav-link">บริการ</a>
+      <a href="#" class="nav-link">ติดต่อเรา</a>
+      <a href="#" class="nav-link">การรับประกัน</a>
+      <a href="#" class="nav-link">ขอใบเสนอราคา</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ─── HERO ─── -->
+<div class="hero-strip">
+  <h1>สินค้าของเรา</h1>
+  <p>รวมสินค้ามาใหม่ ของ Homefittools</p>
+</div>
+
+<!-- ─── TOOLBAR ─── -->
+<div class="toolbar">
+  <div class="cats" id="cat-pills"></div>
+  <div class="toolbar-right">
+    <select id="sort-select">
+      <option value="default">เรียงตามค่าเริ่มต้น</option>
+      <option value="price-asc">ราคา: น้อยไปมาก</option>
+      <option value="price-desc">ราคา: มากไปน้อย</option>
+      <option value="rating">คะแนนสูงสุด</option>
+      <option value="name">ชื่อ A–Z</option>
+    </select>
+    <div class="view-btns">
+      <button class="view-btn active" id="grid-btn" title="Grid view">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/></svg>
+      </button>
+      <button class="view-btn" id="list-btn" title="List view">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── MAIN ─── -->
+<div class="main-container">
+  <aside class="sidebar">
+    <div class="filter-section">
+      <h3>ยี่ห้อ</h3>
+      <select class="filter-select" id="brand-filter"></select>
+    </div>
+    <div class="filter-section">
+      <h3>สี</h3>
+      <select class="filter-select" id="color-filter"></select>
+    </div>
+    <div class="filter-section">
+      <h3>รุ่น</h3>
+      <select class="filter-select" id="model-filter"></select>
+    </div>
+    <div class="filter-section">
+      <h3>ราคา</h3>
+      <div class="filter-options price-range">
+        <input type="number" id="min-price" placeholder="ต่ำสุด" />
+        <span>-</span>
+        <input type="number" id="max-price" placeholder="สูงสุด" />
+        <button id="apply-price-filter">ใช้</button>
+      </div>
+    </div>
+    <div class="filter-section">
+      <h3>รายละเอียดเพิ่มเติม</h3>
+      <select class="filter-select" id="detail-filter"></select>
+    </div>
+    <div class="filter-section">
+      <h3>รูปแบบสินค้า</h3>
+      <select class="filter-select" id="type-filter"></select>
+    </div>
+  </aside>
+  <main class="main-content">
+    <div class="results-bar">
+      <span>แสดง <em id="result-count">0</em> รายการ</span>
+    </div>
+    <div id="product-grid"></div>
+  </main>
+</div>
+
+<!-- ─── TOAST ─── -->
+<div id="toast">🛒 เพิ่มสินค้าลงตะกร้าแล้ว!</div>
+
+<!-- ─── MODAL ─── -->
+<div id="modal-overlay">
+  <div class="modal">
+    <div class="modal-gallery">
+      <img class="modal-img-main" id="modal-img-main" src="" alt="" />
+      <div class="modal-thumbnails" id="modal-thumbnails">
+        <!-- Thumbnails will be injected here -->
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-cat" id="modal-cat"></div>
+      <div class="modal-name" id="modal-name"></div>
+      <div class="modal-desc" id="modal-desc"></div>
+      <div class="modal-price" id="modal-price"></div>
+      <div class="modal-actions">
+        <button class="modal-add" id="modal-add-btn">🛒 เพิ่มลงตะกร้า</button>
+        <button class="modal-close" id="modal-close-btn">ปิด</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── FOOTER ─── -->
+<footer>
+  © HFT — Designed by Piyanat 
+</footer>
+
+<!-- ─── SIDE CART DRAWER ─── -->
+<div id="cart-drawer-overlay"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-header">
+    <h3>ตะกร้าสินค้า</h3>
+    <button class="close-drawer" id="close-cart">×</button>
+  </div>
+  <div class="cart-items" id="drawer-cart-items">
+    <!-- สินค้าในตะกร้าจะถูกโหลดที่นี่ -->
+  </div>
+  <div class="cart-footer">
+    <div class="cart-total-row">
+      <span>ยอดรวมทั้งหมด:</span>
+      <span id="drawer-cart-total">฿0</span>
+    </div>
+    <a href="checkout.html" class="checkout-btn">ไปหน้าชำระเงิน</a>
+  </div>
+</div>
+
+<!-- ─── WELCOME POPUP ─── -->
+<div id="welcome-popup-overlay">
+  <div class="welcome-popup">
+    <h2>ยินดีต้อนรับสู่ HFT Store</h2>
+
+    <p class="desc">
+      เว็บไซต์นี้เป็นผลงานสำหรับการทดสอบและใช้แสดงความสามารถเพื่อประกอบการสมัครงานเท่านั้น 
+      ไม่ได้เปิดให้ใช้งานจริง และขอความร่วมมือไม่นำไปใช้หรือเผยแพร่ต่อ
+    </p>
+
+    <h3>โจทย์</h3>
+    <ul class="task-list">
+      <li>หน้าสินค้ารวมมา 1 หน้า</li>
+      <li>ใช้ HTML / CSS / JS จาก code ล้วน</li>
+      <li>ไม่มีการใช้ CMS</li>
+      <li>ต้องไม่มี bug</li>
+      <li>รองรับทุกขนาดหน้าจอ</li>
+      <li>
+        อ้างอิง:
+        <a href="https://www.homefittools.com/products/weighttraining/fitness-equipment/bench.html" target="_blank">
+          ดูตัวอย่าง
+        </a>
+      </li>
+    </ul>
+
+    <button class="welcome-popup-close" id="welcome-popup-close-btn">
+      เริ่มช้อปปิ้งเลย
+    </button>
+  </div>
+</div>
+
+<script src="cart.js"></script>
+<script>
+/* ─── DATA ─── */
+const PRODUCTS = [
+  { id:1,  name:'ลู่วิ่งไฟฟ้า Tempo Treadmill T82 - Johnson',         cat:'ลู่วิ่ง',         price:23900, oldPrice:25900, rating:4.9, badge:'hot',  img:'./img/t82-1.webp', images:['./img/t82-1.webp', './img/t82-2.webp', './img/t82-3.webp'], desc:'ลู่วิ่งไฟฟ้ามอเตอร์ 3.5HP รับน้ำหนักได้ 120kg พร้อมหน้าจอสัมผัส', brand:'Johnson', color:'ดำ', model:'รุ่น Tempo Treadmill T82', detail:'150 Kg.', type:'หนา 40 มม' },
+  { id:2,  name:'ดัมเบล Dumbbell ดัมเบลปรับน้ำหนัก รุ่น H20 ชุดดัมเบล ขนาด 20 Kg.| Homefittools',         cat:'ดัมเบล',         price:4990,  oldPrice:9980,  rating:4.8, badge:'sale', img:'./img/dumbbell-h20-cover-1.jpg', images:['./img/dumbbell-h20-cover-1.jpg','./img/dumbbell-h32-detail-4_2.jpg', './img/dumbbell-h20-detail-1.jpg'], desc:'ดัมเบลอัจฉริยะ ปรับน้ำหนักได้ 20 ระดับในคู่เดียว ประหยัดพื้นที่', brand:'HFT', color:'ดำ', model:'H20 ชุดดัมเบล', detail:'20 Kg.', type:'ผิวเรียบ' },
+  { id:3,  name:'ลู่วิ่งไฟฟ้า ลู่วิ่งออกกำลังกาย Treadmill รุ่น EASY HOME - Homefittools',         cat:'ลู่วิ่ง',         price:7590, oldPrice:15980, rating:4.9, badge:'hot',  img:'./img/ezy_11zon.jpeg', images:['./img/ezy_11zon.jpeg', './img/treadmill-easy-03.jpg', './img/treadmill-easy-08.jpg'], desc:'ลู่วิ่งไฟฟ้ามอเตอร์ 1.5HP รับน้ำหนักได้ 90kg พร้อมหน้าจอสัมผัส', brand:'Homefittools', color:'ดำ', model:'รุ่น EASY HOME', detail:'90 Kg.', type:'หนา 40 มม' },
+  { id:4,  name:'ดัมเบล Dumbbell ดัมเบลปรับน้ำหนัก 50 Kg.มีกล่อง',         cat:'ดัมเบล',         price:3990,  oldPrice:6990,  rating:4.8, badge:'sale', img:'./img/dumbbell-50kg-1.webp', images:['./img/dumbbell-50kg-1.webp','./img/dumbbell-50kg-2.webp', './img/dumbbell-50kg-5.webp'], desc:'ดัมเบลอัจฉริยะ ปรับน้ำหนักได้ 50 ระดับในคู่เดียว ประหยัดพื้นที่', brand:'HFT', color:'ดำ', model:'H20 ชุดดัมเบล', detail:'50 Kg.', type:'ผิวเรียบ' },
+  { id:5,  name:'ม้านั่งออกกำลังกาย ม้านั่งยกน้ำหนัก ม้านั่งยกดัมเบล ม้านั่งราบ Flat Bench รุ่น F1 | Homefittools',         cat:'ม้านั่ง',         price:1990, oldPrice:2690, rating:4.9, badge:'hot',  img:'./img/_-f1_1.jpg', images:['./img/_-f1_1.jpg', './img/_3_1_3.jpg', './img/_2_1_3.jpg'], desc:'ใช้สำหรับเล่นคู่กับดัมเบล หรือบาร์เบล เพื่อเน้นกล้ามเนื้อ อก แขน ไหล่ ท้อง', brand:'Homefittools', color:'ดำ', model:'รุ่น F1', detail:'300 Kg.', type:'หนา 70 มม' },
+  { id:6,  name:'เครื่องออกกำลังกายกระสอบทรายตั้งพื้น เป้าชกมวยตั้งพื้น แบบสปิน Spin bar อุปกรณ์ชกมวยเกรดพรีเมี่ยม - Homefittools', cat:'คาร์ดิโอ',    price:5790,  oldPrice:13580,  rating:4.7, badge:null,  img:'./img/_-spin-bar.jpg', images:['./img/_-spin-bar.jpg'], desc:'เป้าชกมวยตั้งพื้น แบบสปิน Spin bar', brand:'Homefittools', color:'ดำ', model:'กระสอบทราย', detail:'1000 Kg.', type:'ผิวเรียบ' },
+  { id:7,  name:'เชือกออกกำลังกาย เชือกสะบัด เชือกฟิตเนส Battle Rope ยาว 12 เมตร | Homefittools',       cat:'คาร์ดิโอ',         price:1690,  oldPrice:4190,  rating:4.4, badge:'sale', img:'./img/1_2_14.jpg', images:['./img/1_2_14.jpg'], desc:'เชือกออกกำลังกาย Battle Ropes เป็นการออกกำลังกายประเภทการเคลื่อนไหวอย่างอิสระ และเป็นการออกกำลังกายที่เน้นแรงต้าน', brand:'Homefittools', color:'ดำ', model:'Battle Rope ยาว 12', detail:'10 Kg.', type:'เชือก' },
+  // { id:8,  name:'บาร์โหนติดประตู Heavy Duty',    cat:'อุปกรณ์เสริม',    price:890,   oldPrice:1200,  rating:4.3, badge:'new',  img:'https://images.unsplash.com/photo-1590487988256-9ed24133863e?w=500&q=80', images:['https://images.unsplash.com/photo-1590487988256-9ed24133863e?w=500&q=80', 'https://images.unsplash.com/photo-1584735975644-83e44b2aff2c?w=500&q=80', 'https://images.unsplash.com/photo-1517130038641-a774d04afb3c?w=500&q=80'], desc:'บาร์โหนไม่ต้องเจาะผนัง รับน้ำหนักได้ถึง 150kg', brand:'HFT', color:'ดำ', model:'SINGLE CABLE CORE', detail:'150 LBS', type:'หนา 25 มม' },
+  // { id:9,  name:'เครื่องเดินวงรี Elliptical E2',   cat:'คาร์ดิโอ',       price:18500, oldPrice:null,  rating:4.8, badge:null,  img:'https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=500&q=80', images:['https://images.unsplash.com/photo-1593079831268-3381b0db4a77?w=500&q=80', 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=500&q=80', 'https://images.unsplash.com/photo-1584735975644-83e44b2aff2c?w=500&q=80'], desc:'ถนอมข้อเข่า ปรับความหนืดได้ 16 ระดับ ทำงานเงียบ', brand:'HFT', color:'ขาว', model:'A3', detail:'100 LBS', type:'หนา 30 มม' },
+  // { id:10, name:'ดัมเบล Neoprene 2kg (คู่)',      cat:'ดัมเบล',         price:390,   oldPrice:550,   rating:4.6, badge:'sale', img:'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=500&q=80', images:['https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=500&q=80', 'https://images.unsplash.com/photo-1638536532686-d610adfc8e5c?w=500&q=80', 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=500&q=80'], desc:'ดัมเบลขนาดเล็กสำหรับแอโรบิก หุ้มยางนุ่มกระชับมือ', brand:'HFT', color:'แดง', model:'Dumbbell Rack FGX77Q', detail:'2 กก.', type:'ผิวเรียบ' },
+  // { id:11, name:'ลู่วิ่ง Curve Manual Treadmill', cat:'ลู่วิ่ง',         price:45000, oldPrice:52000, rating:4.9, badge:'hot',  img:'https://images.unsplash.com/photo-1574673139082-1376d4b0ca9a?w=500&q=80', images:['https://images.unsplash.com/photo-1574673139082-1376d4b0ca9a?w=500&q=80', 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&q=80', 'https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=500&q=80'], desc:'ลู่วิ่งไร้สาย ไร้มอเตอร์ ใช้แรงขาในการขับเคลื่อน ให้อารมณ์วิ่งจริง', brand:'HFT', color:'ดำ', model:'รุ่น S7', detail:'15 กก.', type:'หนา 50 มม' },
+  // { id:12, name:'สายแรงต้าน Resistance Band',    cat:'อุปกรณ์เสริม',    price:450,   oldPrice:null,  rating:4.5, badge:'new',  img:'https://images.unsplash.com/photo-1517130038641-a774d04afb3c?w=500&q=80', images:['https://images.unsplash.com/photo-1517130038641-a774d04afb3c?w=500&q=80', 'https://images.unsplash.com/photo-1590487988256-9ed24133863e?w=500&q=80', 'https://images.unsplash.com/photo-1584735975644-83e44b2aff2c?w=500&q=80'], desc:'ชุดสายแรงต้าน 5 ระดับ สำหรับยืดเหยียดและเสริมสร้างกล้ามเนื้อ', brand:'HFT', color:'แดง', model:'SINGLE CABLE CORE PLUS', detail:'12 เมตร', type:'หนา 25 มม' }
+];
+
+/* ─── STATE ─── */
+let activeCategory = 'ทั้งหมด';
+let sortMode = 'default';
+let viewMode = 'grid';
+let liked = new Set();
+let currentModal = null;
+
+let selectedBrand = 'ทั้งหมด';
+let selectedColor = 'ทั้งหมด';
+let selectedModel = 'ทั้งหมด';
+let selectedDetail = 'ทั้งหมด';
+let selectedType = 'ทั้งหมด';
+let minPrice = null;
+let maxPrice = null;
+
+/* ─── DOM ─── */
+const grid = document.getElementById('product-grid');
+const catPills = document.getElementById('cat-pills');
+const searchInput = document.getElementById('search-input');
+const sortSelect = document.getElementById('sort-select');
+const resultCount = document.getElementById('result-count');
+const cartCount = document.getElementById('cart-count');
+const toast = document.getElementById('toast');
+const modalOverlay = document.getElementById('modal-overlay');
+
+const cartDrawer = document.getElementById('cart-drawer');
+const cartDrawerOverlay = document.getElementById('cart-drawer-overlay');
+const drawerCartItems = document.getElementById('drawer-cart-items');
+const drawerCartTotal = document.getElementById('drawer-cart-total');
+const closeCartBtn = document.getElementById('close-cart');
+const headerCartBtn = document.getElementById('cart-btn');
+
+const brandFilter = document.getElementById('brand-filter');
+const colorFilter = document.getElementById('color-filter');
+const modelFilter = document.getElementById('model-filter');
+const detailFilter = document.getElementById('detail-filter');
+const typeFilter = document.getElementById('type-filter');
+const minPriceInput = document.getElementById('min-price');
+const maxPriceInput = document.getElementById('max-price');
+const applyPriceFilterBtn = document.getElementById('apply-price-filter');
+
+/* ─── CATEGORIES ─── */
+const CAT_IMAGES = {
+  'ทั้งหมด': './img/all.png',
+  'ลู่วิ่ง': './img/t82-1.webp',
+  'ดัมเบล': './img/dumbbell-h32-detail-4_2.jpg',
+  'คาร์ดิโอ': './img/_-spin-bar.jpg',
+  'ม้านั่ง': './img/_2_1_3.jpg'
+};
+
+const categories = ['ทั้งหมด', ...new Set(PRODUCTS.map(p => p.cat))];
+categories.forEach(cat => {
+  const item = document.createElement('div');
+  item.className = 'cat-item' + (cat === activeCategory ? ' active' : '');
+  
+  const imgUrl = CAT_IMAGES[cat] || 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=200&q=80';
+  
+  item.innerHTML = `
+    <div class="cat-img-wrap">
+      <img src="${imgUrl}" alt="${cat}">
+    </div>
+    <div class="cat-label">${cat}</div>
+  `;
+
+  item.addEventListener('click', () => {
+    activeCategory = cat;
+    document.querySelectorAll('.cat-item').forEach(el => el.classList.toggle('active', el.querySelector('.cat-label').textContent === cat));
+    render();
+  });
+  catPills.appendChild(item);
+});
+
+/* ─── FILTERS ─── */
+function populateFilters() {
+  const allBrands = [...new Set(PRODUCTS.map(p => p.brand))];
+  const allColors = [...new Set(PRODUCTS.map(p => p.color))];
+  const allModels = [...new Set(PRODUCTS.map(p => p.model))];
+  const allDetails = [...new Set(PRODUCTS.map(p => p.detail))];
+  const allTypes = [...new Set(PRODUCTS.map(p => p.type))];
+
+  populateDropdownFilter(brandFilter, allBrands, selectedBrand, 'brand');
+  populateDropdownFilter(colorFilter, allColors, selectedColor, 'color');
+  populateDropdownFilter(modelFilter, allModels, selectedModel, 'model');
+  populateDropdownFilter(detailFilter, allDetails, selectedDetail, 'detail');
+  populateDropdownFilter(typeFilter, allTypes, selectedType, 'type');
+}
+
+function populateDropdownFilter(container, items, selectedValue, filterType) {
+  container.innerHTML = '';
+  const defaultOption = document.createElement('option');
+  defaultOption.value = 'ทั้งหมด';
+  defaultOption.textContent = `ทั้งหมด`;
+  container.appendChild(defaultOption);
+
+  items.forEach(item => {
+    const option = document.createElement('option');
+    option.value = item;
+    option.textContent = item;
+    container.appendChild(option);
+  });
+
+  container.value = selectedValue;
+  container.addEventListener('change', (e) => {
+    if (filterType === 'brand') selectedBrand = e.target.value;
+    else if (filterType === 'color') selectedColor = e.target.value;
+    else if (filterType === 'model') selectedModel = e.target.value;
+    else if (filterType === 'detail') selectedDetail = e.target.value;
+    else if (filterType === 'type') selectedType = e.target.value;
+    render();
+  });
+}
+
+applyPriceFilterBtn.addEventListener('click', () => {
+  minPrice = parseFloat(minPriceInput.value) || null;
+  maxPrice = parseFloat(maxPriceInput.value) || null;
+  render();
+});
+
+/* ─── FILTER & SORT ─── */
+function getFiltered() {
+  const q = searchInput.value.trim().toLowerCase();
+  let list = PRODUCTS.filter(p => {
+    const matchCat = activeCategory === 'ทั้งหมด' || p.cat === activeCategory;
+    const matchQ = !q || p.name.toLowerCase().includes(q) || p.cat.toLowerCase().includes(q);
+
+    const matchBrand = selectedBrand === 'ทั้งหมด' || p.brand === selectedBrand;
+    const matchColor = selectedColor === 'ทั้งหมด' || p.color === selectedColor;
+    const matchModel = selectedModel === 'ทั้งหมด' || p.model === selectedModel;
+    const matchDetail = selectedDetail === 'ทั้งหมด' || p.detail === selectedDetail;
+    const matchType = selectedType === 'ทั้งหมด' || p.type === selectedType;
+
+    const matchPrice = (minPrice === null || p.price >= minPrice) && (maxPrice === null || p.price <= maxPrice);
+
+    return matchCat && matchQ && matchBrand && matchColor && matchModel && matchDetail && matchType && matchPrice;
+  });
+  if (sortMode === 'price-asc')  list.sort((a,b) => a.price - b.price);
+  if (sortMode === 'price-desc') list.sort((a,b) => b.price - a.price);
+  if (sortMode === 'rating')     list.sort((a,b) => b.rating - a.rating);
+  if (sortMode === 'name')       list.sort((a,b) => a.name.localeCompare(b.name, 'th'));
+  return list;
+}
+
+/* ─── RENDER ─── */
+function fmt(n) { return n.toLocaleString('th-TH'); }
+function stars(r) {
+  const full = Math.floor(r), half = r % 1 >= .5;
+  return '★'.repeat(full) + (half ? '½' : '') + '☆'.repeat(5 - full - (half?1:0));
+}
+
+function render() {
+  const list = getFiltered();
+  resultCount.textContent = list.length;
+  grid.innerHTML = '';
+
+  if (list.length === 0) {
+    grid.innerHTML = `<div class="empty-state"><div class="icon">🔍</div><h3>ไม่พบสินค้า</h3><p>ลองเปลี่ยนคำค้นหาหรือหมวดหมู่</p></div>`;
+    return;
+  }
+
+  list.forEach((p, i) => {
+    const card = document.createElement('div');
+    card.className = 'p-card';
+    card.style.animationDelay = `${i * 0.04}s`;
+    const isLiked = liked.has(p.id);
+    card.innerHTML = `
+      <div class="p-img-wrap">
+        <img src="${p.img}" alt="${p.name}" loading="lazy" />
+        ${p.badge ? `<span class="badge badge-${p.badge}">${p.badge === 'new' ? 'ใหม่' : p.badge === 'sale' ? 'ลดราคา' : 'ฮิต'}</span>` : ''}
+        <button class="p-wishlist${isLiked ? ' liked' : ''}" data-id="${p.id}" title="ถูกใจ">♥</button>
+      </div>
+      <div class="p-body">
+        <div class="p-cat">${p.cat}</div>
+        <div class="p-name">${p.name}</div>
+        <div class="p-stars"><span class="stars">${stars(p.rating)}</span><span>${p.rating}</span></div>
+        <div class="p-footer">
+          <div class="p-price">
+            <span class="price-main">฿${fmt(p.price)}</span>
+            ${p.oldPrice ? `<span class="price-old">฿${fmt(p.oldPrice)}</span>` : ''}
+          </div>
+          <button class="add-btn" data-id="${p.id}">+ ตะกร้า</button>
+        </div>
+      </div>`;
+
+    // click card → modal
+    card.addEventListener('click', (e) => {
+      if (e.target.classList.contains('add-btn') || e.target.classList.contains('p-wishlist')) return;
+      openModal(p);
+    });
+    // add to cart
+    card.querySelector('.add-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      addToCart(p, e.currentTarget);
+    });
+    // wishlist
+    card.querySelector('.p-wishlist').addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleLike(p.id, e.currentTarget);
+    });
+
+    grid.appendChild(card);
+  });
+}
+
+/* ─── CART ─── */
+function addToCart(p, btn) {
+  Cart.add(p);
+  btn.textContent = '✓ เพิ่มแล้ว';
+  btn.classList.add('added');
+  setTimeout(() => { btn.textContent = '+ ตะกร้า'; btn.classList.remove('added'); }, 2000);
+  showToast(`"${p.name.slice(0,20)}…" เพิ่มแล้ว 🛒`);
+}
+
+function updateCartUI(cart) {
+  // อัปเดตตัวเลขบนตะกร้าที่ Header
+  const count = Cart.getCount();
+  cartCount.textContent = count;
+  cartCount.style.display = count > 0 ? 'flex' : 'none';
+
+  // อัปเดตสินค้าใน Side Drawer
+  drawerCartItems.innerHTML = '';
+  if (cart.length === 0) {
+    drawerCartItems.innerHTML = '<p style="text-align:center; color:#7a7875; margin-top:40px;">ไม่มีสินค้าในตะกร้า</p>';
+  } else {
+    cart.forEach(item => {
+      drawerCartItems.innerHTML += `
+        <div class="cart-item">
+          <img src="${item.img}" alt="${item.name}">
+          <div class="cart-item-info">
+            <div class="cart-item-name">${item.name}</div>
+            <div class="cart-item-price">฿${item.price.toLocaleString()}</div>
+            <div class="cart-qty-control">
+              <button class="qty-btn" onclick="Cart.updateQuantity(${item.id}, -1)">-</button>
+              <span>${item.quantity}</span>
+              <button class="qty-btn" onclick="Cart.updateQuantity(${item.id}, 1)">+</button>
+              <button class="remove-item" onclick="Cart.remove(${item.id})">ลบ</button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  drawerCartTotal.textContent = `฿${Cart.getTotal().toLocaleString()}`;
+}
+
+// จัดการการเปิด-ปิด Drawer
+function toggleCartDrawer(open) {
+  if (open) {
+    cartDrawerOverlay.classList.add('open');
+    cartDrawer.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  } else {
+    cartDrawerOverlay.classList.remove('open');
+    cartDrawer.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+
+headerCartBtn.addEventListener('click', () => toggleCartDrawer(true));
+closeCartBtn.addEventListener('click', () => toggleCartDrawer(false));
+cartDrawerOverlay.addEventListener('click', () => toggleCartDrawer(false));
+
+// ติดตามการเปลี่ยนแปลงของตะกร้า
+Cart.onUpdate(updateCartUI);
+
+/* ─── WISHLIST ─── */
+function toggleLike(id, btn) {
+  if (liked.has(id)) { liked.delete(id); btn.classList.remove('liked'); }
+  else               { liked.add(id);    btn.classList.add('liked'); showToast('❤️ บันทึกในรายการโปรดแล้ว'); }
+}
+
+/* ─── TOAST ─── */
+let toastTimer;
+function showToast(msg) {
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+}
+
+/* ─── MODAL ─── */
+function openModal(p) {
+  currentModal = p;
+  const mainImg = document.getElementById('modal-img-main');
+  const thumbContainer = document.getElementById('modal-thumbnails');
+  
+  mainImg.src = p.img;
+  thumbContainer.innerHTML = '';
+  
+  if (p.images && p.images.length > 0) {
+    p.images.forEach((imgSrc, idx) => {
+      const thumb = document.createElement('img');
+      thumb.src = imgSrc;
+      thumb.className = 'modal-thumb' + (imgSrc === p.img ? ' active' : '');
+      thumb.addEventListener('click', () => {
+        mainImg.src = imgSrc;
+        document.querySelectorAll('.modal-thumb').forEach(t => t.classList.remove('active'));
+        thumb.classList.add('active');
+      });
+      thumbContainer.appendChild(thumb);
+    });
+  }
+
+  document.getElementById('modal-cat').textContent = p.cat;
+  document.getElementById('modal-name').textContent = p.name;
+  document.getElementById('modal-desc').textContent = p.desc;
+  document.getElementById('modal-price').textContent = `฿${fmt(p.price)}`;
+  modalOverlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  modalOverlay.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+document.getElementById('modal-add-btn').addEventListener('click', () => {
+  if (currentModal) { 
+    Cart.add(currentModal); 
+    showToast(`"${currentModal.name.slice(0,20)}…" เพิ่มแล้ว 🛒`);
+    closeModal(); 
+  }
+});
+modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+
+/* ─── VIEW TOGGLE ─── */
+document.getElementById('grid-btn').addEventListener('click', () => {
+  viewMode = 'grid';
+  grid.classList.remove('list-view');
+  document.getElementById('grid-btn').classList.add('active');
+  document.getElementById('list-btn').classList.remove('active');
+});
+document.getElementById('list-btn').addEventListener('click', () => {
+  viewMode = 'list';
+  grid.classList.add('list-view');
+  document.getElementById('list-btn').classList.add('active');
+  document.getElementById('grid-btn').classList.remove('active');
+});
+
+/* ─── EVENTS ─── */
+searchInput.addEventListener('input', render);
+sortSelect.addEventListener('change', (e) => { sortMode = e.target.value; render(); });
+
+/* ─── MOBILE NAV & SEARCH ─── */
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const navInner = document.getElementById('nav-inner');
+const mobileSearchBtn = document.getElementById('mobile-search-btn');
+const mobileSearchWrap = document.getElementById('mobile-search');
+const mobileSearchInput = document.getElementById('mobile-search-input');
+
+hamburgerBtn.addEventListener('click', () => {
+  navInner.classList.toggle('open');
+});
+
+mobileSearchBtn.addEventListener('click', () => {
+  mobileSearchWrap.classList.toggle('active');
+  if (mobileSearchWrap.classList.contains('active')) {
+    mobileSearchInput.focus();
+  }
+});
+
+mobileSearchInput.addEventListener('input', (e) => {
+  searchInput.value = e.target.value;
+  render();
+});
+
+/* ─── NAV LINKS ─── */
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', function(e) {
+    if (this.getAttribute('href') === '#') {
+      e.preventDefault();
+      alert('Coming soon');
+    }
+  });
+});
+
+/* ─── INIT ─── */
+populateFilters();
+render();
+
+/* ─── WELCOME POPUP LOGIC ─── */
+const welcomePopup = document.getElementById('welcome-popup-overlay');
+const closeWelcomeBtn = document.getElementById('welcome-popup-close-btn');
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    welcomePopup.classList.add('open');
+  }, 500);
+});
+
+closeWelcomeBtn.addEventListener('click', () => {
+  welcomePopup.classList.remove('open');
+});
+
+welcomePopup.addEventListener('click', (e) => {
+  if (e.target === welcomePopup) {
+    welcomePopup.classList.remove('open');
+  }
+});
+</script>
+</body>
+</html>
